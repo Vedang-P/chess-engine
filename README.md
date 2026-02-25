@@ -4,19 +4,17 @@
   <img src="frontend/public/janus-logo.jpg" alt="JANUS logo" width="180" />
 </p>
 
-**JANUS** is a performance-oriented classical chess engine with a real-time web visualization interface.
+**JANUS** is a classical chess engine with a real-time web visualization interface.
 
 It combines:
-- **Correct engine fundamentals** (bitboards, legal move generation, perft-tested correctness)
-- **Search + evaluation transparency** (live PV, candidate moves, eval trends, piece breakdowns)
+- **Engine fundamentals** (bitboards, legal move generation, perft-tested correctness)
+- **Search + evaluation** (live PV, candidate moves, eval trends, piece breakdowns)
 
-This project is designed to be understandable for newcomers while still technically rigorous for engineers.
 
 ## What This Project Does
-At a high level, JANUS lets you:
-1. Play moves on an interactive board.
-2. Run live engine analysis in real time.
-3. See *why* the engine prefers a move through visual telemetry and dynamic piece valuation.
+JANUS lets you:
+1. Run live engine analysis in real time.
+2. See *why* the engine prefers a move through visual telemetry and dynamic piece valuation.
 
 Unlike opaque chess bots, JANUS exposes internal search behavior as the engine thinks.
 
@@ -43,7 +41,7 @@ Unlike opaque chess bots, JANUS exposes internal search behavior as the engine t
 ## Tech Stack
 - **Backend:** Python 3.11+, FastAPI, Uvicorn
 - **Frontend:** React (Vite), SVG rendering
-- **Engine:** Custom implementation (no heavy engine libraries)
+- **Engine:** Custom implementation 
 - **Transport:** REST + WebSockets
 
 ## Repository Structure
@@ -101,7 +99,7 @@ npm run dev
 
 Open the frontend URL shown by Vite (usually `http://127.0.0.1:5173`).
 
-## How to Use (Quick)
+## How to Use 
 1. Start a new game from the right panel.
 2. Move pieces by drag-and-drop or click-to-move.
 3. Click **Analyze** to run engine evaluation for the current position.

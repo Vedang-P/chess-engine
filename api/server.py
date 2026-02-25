@@ -140,12 +140,6 @@ def move(payload: MoveRequest) -> dict:
     return response
 
 
-@app.post("/apply-move")
-def apply_move(payload: MoveRequest) -> dict:
-    # Backward-compatible alias.
-    return move(payload)
-
-
 @app.post("/engine-move")
 def engine_move(payload: AnalyzeRequest) -> dict:
     board = _board_from_fen(payload.fen)

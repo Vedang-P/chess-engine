@@ -240,20 +240,48 @@ export default function App() {
     [applyPosition]
   );
 
+  const recordMoveLocally = useCallback((move, actor) => {
+    setLastMove({ from: move.slice(0, 2), to: move.slice(2, 4) });
+    setMoveLog((prev) => [...prev, { by: actor, move }]);
+    setTrackedSquare((prev) => {
+      if (!prev) return prev;
+      if (prev === move.slice(0, 2)) return move.slice(2, 4);
+      return prev;
+    });
+  }, []);
+
+  const clearSessionUiState = useCallback(() => {
+    setThinking(false);
+    setMoveLog([]);
+    setLastMove(null);
+    setTrackedSquare(null);
+    setSearch({ ...EMPTY_SEARCH });
+    setSearchTimeline([]);
+  }, []);
+
+  const appendSearchTimelineFrame = useCallback((view) => {
+    setSearchTimeline((prev) => {
+      const next = [
+        ...prev,
+        {
+          eval_cp: view.eval_cp ?? 0,
+          nodes: view.nodes,
+          depth: view.depth,
+          cutoffs: view.cutoffs
+        }
+      ];
+      return next.slice(-64);
+    });
+  }, []);
+
   const applyMoveToPosition = useCallback(
     async (fromFen, move, actor) => {
       const data = await movePosition(fromFen, move);
       applyPosition(data);
-      setLastMove({ from: move.slice(0, 2), to: move.slice(2, 4) });
-      setMoveLog((prev) => [...prev, { by: actor, move }]);
-      setTrackedSquare((prev) => {
-        if (!prev) return prev;
-        if (prev === move.slice(0, 2)) return move.slice(2, 4);
-        return prev;
-      });
+      recordMoveLocally(move, actor);
       return data;
     },
-    [applyPosition]
+    [applyPosition, recordMoveLocally]
   );
 
   const buildSearchView = useCallback((payload, whiteSign) => {
@@ -293,29 +321,12 @@ export default function App() {
 
         if (autoPlayBestMove && payload.best_move) {
           applyPosition(payload);
-          setLastMove({ from: payload.best_move.slice(0, 2), to: payload.best_move.slice(2, 4) });
-          setMoveLog((prev) => [...prev, { by: "engine", move: payload.best_move }]);
-          setTrackedSquare((prev) => {
-            if (!prev) return prev;
-            if (prev === payload.best_move.slice(0, 2)) return payload.best_move.slice(2, 4);
-            return prev;
-          });
+          recordMoveLocally(payload.best_move, "engine");
         }
 
         const view = buildSearchView(payload, whiteSign);
         setSearch(view);
-        setSearchTimeline((prev) => {
-          const next = [
-            ...prev,
-            {
-              eval_cp: view.eval_cp ?? 0,
-              nodes: view.nodes,
-              depth: view.depth,
-              cutoffs: view.cutoffs
-            }
-          ];
-          return next.slice(-64);
-        });
+        appendSearchTimelineFrame(view);
       } catch (err) {
         if (token !== searchTokenRef.current) return;
         setError(err.message || "Fallback search failed.");
@@ -325,7 +336,16 @@ export default function App() {
         }
       }
     },
-    [analyzePosition, applyPosition, buildSearchView, engineMovePosition, maxDepth, timeMs]
+    [
+      analyzePosition,
+      appendSearchTimelineFrame,
+      applyPosition,
+      buildSearchView,
+      engineMovePosition,
+      maxDepth,
+      recordMoveLocally,
+      timeMs
+    ]
   );
 
   const startLiveSearch = useCallback(
@@ -397,18 +417,7 @@ export default function App() {
           lastSnapshotUiUpdateRef.current = now;
           const view = buildSearchView(data, whiteSign);
           setSearch(view);
-          setSearchTimeline((prev) => {
-            const next = [
-              ...prev,
-              {
-                eval_cp: view.eval_cp ?? 0,
-                nodes: view.nodes,
-                depth: view.depth,
-                cutoffs: view.cutoffs
-              }
-            ];
-            return next.slice(-64);
-          });
+          appendSearchTimelineFrame(view);
           return;
         }
 
@@ -471,7 +480,15 @@ export default function App() {
         }
       };
     },
-    [applyMoveToPosition, buildSearchView, closeSocket, maxDepth, runHttpFallbackSearch, timeMs]
+    [
+      appendSearchTimelineFrame,
+      applyMoveToPosition,
+      buildSearchView,
+      closeSocket,
+      maxDepth,
+      runHttpFallbackSearch,
+      timeMs
+    ]
   );
 
   useEffect(() => {
@@ -625,35 +642,25 @@ export default function App() {
       setError("");
       searchTokenRef.current += 1;
       closeSocket();
-      setThinking(false);
-      setMoveLog([]);
-      setLastMove(null);
-      setTrackedSquare(null);
-      setSearch({ ...EMPTY_SEARCH });
-      setSearchTimeline([]);
+      clearSessionUiState();
       await refreshPosition(fenDraft);
     } catch (err) {
       setError(err.message);
     }
-  }, [fenDraft, closeSocket, refreshPosition]);
+  }, [clearSessionUiState, fenDraft, closeSocket, refreshPosition]);
 
   const resetGame = useCallback(async () => {
     try {
       setError("");
       searchTokenRef.current += 1;
       closeSocket();
-      setThinking(false);
-      setMoveLog([]);
-      setLastMove(null);
-      setTrackedSquare(null);
-      setSearch({ ...EMPTY_SEARCH });
-      setSearchTimeline([]);
+      clearSessionUiState();
       const data = await resetPosition();
       applyPosition(data);
     } catch (err) {
       setError(err.message);
     }
-  }, [applyPosition, closeSocket]);
+  }, [applyPosition, clearSessionUiState, closeSocket]);
 
   const analyzeCurrentPosition = useCallback(() => {
     if (thinking) return;

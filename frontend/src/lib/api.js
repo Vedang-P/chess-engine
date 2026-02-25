@@ -45,11 +45,8 @@ export function engineMovePosition(fen, maxDepth, timeLimitMs) {
   return post("/engine-move", { fen, max_depth: maxDepth, time_limit_ms: timeLimitMs });
 }
 
-export function resetPosition(fen) {
-  if (!fen) {
-    return post("/reset", {});
-  }
-  return post("/reset", { fen });
+export function resetPosition() {
+  return post("/reset", {});
 }
 
 export function createSearchSocket() {

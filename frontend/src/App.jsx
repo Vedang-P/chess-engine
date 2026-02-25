@@ -190,7 +190,7 @@ export default function App() {
 
     const bestCandidate = candidateList[0];
     if (bestCandidate) {
-      const arrow = moveToArrow(bestCandidate.move, "#c6a25a", 10, 0.95);
+      const arrow = moveToArrow(bestCandidate.move, "#7fa650", 10, 0.88);
       if (arrow) {
         const key = `${arrow.from}-${arrow.to}`;
         seen.add(key);
@@ -200,7 +200,7 @@ export default function App() {
 
     const pvPrimary = search.pv[0];
     if (pvPrimary) {
-      const arrow = moveToArrow(pvPrimary, "#8f7a55", 7, 0.72);
+      const arrow = moveToArrow(pvPrimary, "#7fa650", 7, 0.64);
       if (arrow) {
         const key = `${arrow.from}-${arrow.to}`;
         if (!seen.has(key)) {

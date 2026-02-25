@@ -87,48 +87,6 @@ function pieceAssetName(piece) {
   return `${isWhite ? "w" : "b"}${piece.toUpperCase()}`;
 }
 
-function arrowGeometry(from, to, cell) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const len = Math.hypot(dx, dy);
-  if (len < 1e-6) return null;
-
-  const ux = dx / len;
-  const uy = dy / len;
-  const px = -uy;
-  const py = ux;
-
-  const tailInset = cell * 0.18;
-  const headLength = cell * 0.24;
-  const headWidth = cell * 0.19;
-  const tipInset = cell * 0.16;
-
-  const sx = from.x + ux * tailInset;
-  const sy = from.y + uy * tailInset;
-  const tipX = to.x - ux * tipInset;
-  const tipY = to.y - uy * tipInset;
-  const ex = tipX - ux * headLength;
-  const ey = tipY - uy * headLength;
-
-  const leftX = ex + px * (headWidth / 2);
-  const leftY = ey + py * (headWidth / 2);
-  const rightX = ex - px * (headWidth / 2);
-  const rightY = ey - py * (headWidth / 2);
-
-  return {
-    sx,
-    sy,
-    ex,
-    ey,
-    tipX,
-    tipY,
-    leftX,
-    leftY,
-    rightX,
-    rightY
-  };
-}
-
 export default function ChessBoard({
   fen,
   orientation = "white",
@@ -225,6 +183,9 @@ export default function ChessBoard({
           <stop offset="0%" stopColor="#b58863" />
           <stop offset="100%" stopColor="#b58863" />
         </linearGradient>
+        <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="3.5" orient="auto">
+          <polygon points="0 0, 8 3.5, 0 7" fill="#7fa650" />
+        </marker>
       </defs>
 
       {Array.from({ length: 64 }).map((_, displayIndex) => {
@@ -375,40 +336,19 @@ export default function ChessBoard({
       {arrows.map((arrow, idx) => {
         const from = squareToDisplayCoords(arrow.from, size, orientation);
         const to = squareToDisplayCoords(arrow.to, size, orientation);
-        const geometry = arrowGeometry(from, to, cell);
-        if (!geometry) return null;
-        const color = arrow.color || "#c6a25a";
-        const width = Math.max(4, arrow.width || 8);
-        const opacity = arrow.opacity || 0.82;
         return (
-          <g key={`${arrow.from}-${arrow.to}-${idx}`}>
-            <line
-              x1={geometry.sx}
-              y1={geometry.sy}
-              x2={geometry.ex}
-              y2={geometry.ey}
-              stroke="#111111"
-              strokeWidth={width + 3}
-              strokeLinecap="round"
-              opacity={Math.min(0.5, opacity)}
-            />
-            <line
-              x1={geometry.sx}
-              y1={geometry.sy}
-              x2={geometry.ex}
-              y2={geometry.ey}
-              stroke={color}
-              strokeWidth={width}
-              strokeLinecap="round"
-              opacity={opacity}
-            />
-            <polygon
-              points={`${geometry.tipX},${geometry.tipY} ${geometry.leftX},${geometry.leftY} ${geometry.rightX},${geometry.rightY}`}
-              fill={color}
-              opacity={opacity}
-            />
-            <circle cx={geometry.sx} cy={geometry.sy} r={Math.max(2.4, width * 0.32)} fill={color} opacity={opacity} />
-          </g>
+          <line
+            key={`${arrow.from}-${arrow.to}-${idx}`}
+            x1={from.x}
+            y1={from.y}
+            x2={to.x}
+            y2={to.y}
+            stroke={arrow.color || "#7fa650"}
+            strokeWidth={arrow.width || 8}
+            strokeLinecap="round"
+            markerEnd="url(#arrowHead)"
+            opacity={arrow.opacity || 0.82}
+          />
         );
       })}
 

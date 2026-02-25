@@ -1,4 +1,4 @@
-# JANUS: Chess Engine + Live Analysis Platform
+# JANUS: Chess Engine & Live Eval
 
 <p align="center">
   <img src="frontend/public/janus-logo.jpg" alt="JANUS logo" width="220" />
@@ -17,9 +17,6 @@ JANUS is designed to make engine decisions understandable, not opaque.
 - Explainable evaluation breakdown (material, PST, mobility, king safety, pawn structure)
 - Interactive board overlays: PV arrows, candidate ranking, heatmap, dynamic piece values
 
-## Visuals
-All visual assets live in [`docs/visuals/`](docs/visuals).
-
 ### 1) Architecture
 ![JANUS Architecture](docs/visuals/architecture.svg)
 
@@ -36,10 +33,7 @@ flowchart LR
   DONE --> FE
 ```
 
-### 2) Search Lifecycle
-![Search Lifecycle](docs/visuals/search-lifecycle.svg)
-
-### 3) Movegen Pipeline
+### 2) Movegen Pipeline
 ![Movegen Pipeline](docs/visuals/movegen-pipeline.svg)
 
 ```mermaid
@@ -50,13 +44,12 @@ flowchart LR
   UNMAKE --> KEEP["Keep only legal moves"]
 ```
 
-### 4) Evaluation Breakdown
+### 3) Evaluation Breakdown
 ![Evaluation Breakdown](docs/visuals/evaluation-breakdown.svg)
 
-### 5) Performance Charts (Generated from CSV)
+### 4) Performance Charts (Generated from CSV)
 ![Performance Charts](docs/visuals/performance-charts.svg)
 
-### Demo GIFs
 | Demo | Preview |
 |---|---|
 | Play move + engine response | ![Play and engine response](docs/visuals/demo-play-engine.gif) |
@@ -151,14 +144,3 @@ scripts/            benchmark + plotting + gif generation scripts
 docs/metrics/       generated benchmark CSV files
 docs/visuals/       architecture/search/eval SVGs + demo GIFs
 ```
-
-## Limitations
-- No opening book or endgame tablebase integration yet
-- No transposition table / quiescence search yet
-- Current demo GIFs are generated walkthrough assets, not screen-captured gameplay sessions
-
-## Roadmap
-- Add transposition table and move ordering heuristics (killer/history)
-- Add quiescence search to stabilize tactical evaluation
-- Add real captured product GIFs from deployed UI sessions
-- Add automated benchmark history tracking across commits

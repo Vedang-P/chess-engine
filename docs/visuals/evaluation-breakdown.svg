@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="940" viewBox="0 0 1600 940" role="img" aria-label="Evaluation breakdown diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="880" viewBox="0 0 1600 880" role="img" aria-label="Evaluation breakdown diagram">
   <defs>
     <style>
       .bg { fill: #161616; }
@@ -15,7 +15,7 @@
     </marker>
   </defs>
 
-  <rect class="bg" x="0" y="0" width="1600" height="940" />
+  <rect class="bg" x="0" y="0" width="1600" height="880" />
   <text class="title" x="70" y="82">Evaluation Breakdown</text>
   <text class="subtitle" x="70" y="116">Centipawn score built from interpretable chess terms</text>
 
@@ -50,12 +50,9 @@
   <path class="edge" d="M1135 340 C1135 470, 760 470, 760 580" />
   <path class="edge" d="M1420 340 C1420 470, 820 470, 820 580" />
 
-  <rect class="panel" x="520" y="580" width="560" height="220" />
-  <text class="h" x="560" y="640">Final Score Assembly</text>
-  <text class="mono" x="560" y="690">white_total - black_total = white_minus_black</text>
-  <text class="mono" x="560" y="730">score_cp = side_to_move == white ? +x : -x</text>
-  <text class="t" x="560" y="770">Detailed maps emitted: piece_values, piece_breakdown, heatmap</text>
-
-  <rect class="panel" x="70" y="840" width="1460" height="70" />
-  <text class="t" x="100" y="884">All terms are exposed to UI for explainability, not just final eval.</text>
+  <rect class="panel" x="460" y="560" width="680" height="230" />
+  <text class="h" x="500" y="620">Final Score Assembly</text>
+  <text class="mono" x="500" y="670">white_total - black_total = white_minus_black</text>
+  <text class="mono" x="500" y="710">score_cp = (side_to_move == white) ? +x : -x</text>
+  <text class="t" x="500" y="750">Detailed maps emitted: piece_values, piece_breakdown, heatmap</text>
 </svg>

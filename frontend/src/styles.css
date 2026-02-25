@@ -37,6 +37,17 @@ body {
   padding: 14px;
 }
 
+/* Browsers do not allow forcing zoom; tune desktop layout to match ~90% visual scale. */
+@media (min-width: 1100px) {
+  html {
+    font-size: 90%;
+  }
+
+  .page {
+    max-width: 1242px;
+  }
+}
+
 .hero {
   display: flex;
   justify-content: center;

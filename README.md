@@ -107,6 +107,9 @@ Search emits throttled snapshots (`~80ms` default):
   - Dynamic piece valuation inspector (hover square)
   - Search progression mini-timeline + cutoff counters
 
+Piece assets:
+- Uses Lichess `cburnett` SVG pieces in [frontend/public/pieces/cburnett](/Users/vedang/Desktop/Projects/Chess_engine/frontend/public/pieces/cburnett)
+
 ## Perft Correctness Proof
 | Position | Depth | Expected | Actual |
 |---|---:|---:|---:|

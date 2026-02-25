@@ -80,12 +80,12 @@ export default function App() {
     const candidateArrows = candidateList.slice(0, 3).map((candidate, idx) =>
       moveToArrow(
         candidate.move,
-        idx === 0 ? "#ff8243" : "#7bdaf8",
-        idx === 0 ? 10 : 7,
-        idx === 0 ? 0.92 : 0.7
+        idx === 0 ? "#7fa650" : "#6f8f4d",
+        idx === 0 ? 9 : 7,
+        idx === 0 ? 0.9 : 0.75
       )
     );
-    const pvArrows = search.pv.slice(0, 2).map((move) => moveToArrow(move, "#ffdb6e", 6, 0.65));
+    const pvArrows = search.pv.slice(0, 2).map((move) => moveToArrow(move, "#96b870", 6, 0.62));
     return [...candidateArrows, ...pvArrows].filter(Boolean);
   }, [candidateList, search.pv]);
 
@@ -354,9 +354,9 @@ export default function App() {
     <div className="page">
       <header className="hero">
         <div>
-          <h1>Chess Research Visualizer</h1>
+          <h1>Local Analysis Board</h1>
           <p>
-            Live alpha-beta search snapshots over WebSocket with explainable piece valuations. API: <code>{API_BASE}</code>
+            Clean, Lichess-inspired layout with live engine analysis. API: <code>{API_BASE}</code>
           </p>
         </div>
         <div className={`status-pill status-${status}`}>
@@ -540,9 +540,7 @@ export default function App() {
                     className="timeline-bar"
                     style={{
                       height: `${h}px`,
-                      background: positive
-                        ? "linear-gradient(180deg, rgba(255,130,67,0.95), rgba(255,130,67,0.45))"
-                        : "linear-gradient(180deg, rgba(104,215,255,0.95), rgba(104,215,255,0.4))"
+                      background: positive ? "#7fa650" : "#7f7b73"
                     }}
                     title={`depth ${frame.depth} | eval ${frame.eval_cp} | nodes ${frame.nodes}`}
                   />

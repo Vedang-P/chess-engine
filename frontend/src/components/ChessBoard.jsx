@@ -1,20 +1,5 @@
 import { FILES, indexToSquare, parseFenBoard } from "../lib/chess";
 
-const PIECE_TO_TEXT = {
-  P: "♙",
-  N: "♘",
-  B: "♗",
-  R: "♖",
-  Q: "♕",
-  K: "♔",
-  p: "♟",
-  n: "♞",
-  b: "♝",
-  r: "♜",
-  q: "♛",
-  k: "♚"
-};
-
 function displaySquareToBoardIndex(displayIndex, orientation) {
   const row = Math.floor(displayIndex / 8);
   const col = displayIndex % 8;
@@ -45,7 +30,12 @@ function squareToDisplayCoords(square, size, orientation) {
 }
 
 function heatOpacity(value) {
-  return Math.min(0.42, 0.08 + Math.abs(value) * 0.06);
+  return Math.min(0.26, 0.05 + Math.abs(value) * 0.03);
+}
+
+function pieceAssetName(piece) {
+  const isWhite = piece === piece.toUpperCase();
+  return `${isWhite ? "w" : "b"}${piece.toUpperCase()}`;
 }
 
 export default function ChessBoard({
@@ -72,16 +62,16 @@ export default function ChessBoard({
   return (
     <svg className="board" viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Chess board">
       <defs>
-        <linearGradient id="lightSquare" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="#f9f4e3" />
-          <stop offset="100%" stopColor="#ecd8a8" />
+        <linearGradient id="lightSquare" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#f0d9b5" />
+          <stop offset="100%" stopColor="#f0d9b5" />
         </linearGradient>
-        <linearGradient id="darkSquare" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="#295049" />
-          <stop offset="100%" stopColor="#1a342f" />
+        <linearGradient id="darkSquare" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#b58863" />
+          <stop offset="100%" stopColor="#b58863" />
         </linearGradient>
         <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="3.5" orient="auto">
-          <polygon points="0 0, 8 3.5, 0 7" fill="#ff8243" />
+          <polygon points="0 0, 8 3.5, 0 7" fill="#7fa650" />
         </marker>
       </defs>
 
@@ -118,7 +108,7 @@ export default function ChessBoard({
                 y={y + 1.5}
                 width={cell - 3}
                 height={cell - 3}
-                fill={heatPositive ? "#ff8243" : "#68d7ff"}
+                fill={heatPositive ? "#7fa650" : "#8f8a84"}
                 opacity={heatOpacity(heat)}
               />
             )}
@@ -130,9 +120,9 @@ export default function ChessBoard({
                 width={cell - 4}
                 height={cell - 4}
                 fill="none"
-                stroke="#ffbf6b"
-                strokeWidth="3"
-                opacity="0.85"
+                stroke="#cdd26a"
+                strokeWidth="3.5"
+                opacity="0.92"
               />
             )}
 
@@ -143,7 +133,7 @@ export default function ChessBoard({
                 width={cell - 10}
                 height={cell - 10}
                 fill="none"
-                stroke="#7bdaf8"
+                stroke="#6f9d4f"
                 strokeWidth="4"
                 opacity="0.95"
               />
@@ -156,13 +146,13 @@ export default function ChessBoard({
                 width={cell - 8}
                 height={cell - 8}
                 fill="none"
-                stroke="#d2ff72"
+                stroke="#7fa650"
                 strokeWidth="4"
               />
             )}
 
             {isTarget && (
-              <circle cx={x + cell / 2} cy={y + cell / 2} r={cell * 0.15} fill="#ff8243" opacity="0.95" />
+              <circle cx={x + cell / 2} cy={y + cell / 2} r={cell * 0.14} fill="#6f9d4f" opacity="0.9" />
             )}
 
             {isHovered && (
@@ -172,9 +162,9 @@ export default function ChessBoard({
                 width={cell - 16}
                 height={cell - 16}
                 fill="none"
-                stroke="#f0f5ff"
+                stroke="#6b6760"
                 strokeWidth="2"
-                opacity="0.8"
+                opacity="0.72"
               />
             )}
           </g>
@@ -191,7 +181,7 @@ export default function ChessBoard({
             y1={from.y}
             x2={to.x}
             y2={to.y}
-            stroke={arrow.color || "#ff8243"}
+            stroke={arrow.color || "#7fa650"}
             strokeWidth={arrow.width || 8}
             strokeLinecap="round"
             markerEnd="url(#arrowHead)"
@@ -205,21 +195,21 @@ export default function ChessBoard({
         const piece = board[boardIndex];
         if (!piece) return null;
 
-        const x = (displayIndex % 8) * cell + cell / 2;
-        const y = Math.floor(displayIndex / 8) * cell + cell / 2 + 23;
+        const x = (displayIndex % 8) * cell;
+        const y = Math.floor(displayIndex / 8) * cell;
+        const asset = pieceAssetName(piece);
 
         return (
-          <text
+          <image
             key={`piece-${boardIndex}`}
-            x={x}
-            y={y}
-            textAnchor="middle"
-            fontSize="62"
-            className="piece"
+            x={x + 4}
+            y={y + 4}
+            width={cell - 8}
+            height={cell - 8}
+            href={`/pieces/cburnett/${asset}.svg`}
+            preserveAspectRatio="xMidYMid meet"
             pointerEvents="none"
-          >
-            {PIECE_TO_TEXT[piece]}
-          </text>
+          />
         );
       })}
 

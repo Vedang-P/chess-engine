@@ -109,6 +109,15 @@ function buildMoveRows(moves) {
   return rows;
 }
 
+function normalizeFenInput(rawFen) {
+  const normalized = String(rawFen || "")
+    .trim()
+    .replace(/\s+/g, " ");
+  if (!normalized) return "";
+  if (normalized.toLowerCase() === "startpos") return START_FEN;
+  return normalized;
+}
+
 export default function App() {
   const [fen, setFen] = useState(START_FEN);
   const [fenDraft, setFenDraft] = useState(START_FEN);
@@ -176,11 +185,31 @@ export default function App() {
   }, [legalMoves, selectedSquare]);
 
   const arrows = useMemo(() => {
-    const candidateArrows = candidateList.slice(0, 2).map((candidate, idx) =>
-      moveToArrow(candidate.move, idx === 0 ? "#7fa650" : "#5e7a43", idx === 0 ? 8 : 6, idx === 0 ? 0.9 : 0.75)
-    );
-    const pvArrows = search.pv.slice(0, 2).map((move) => moveToArrow(move, "#8cae63", 5, 0.6));
-    return [...candidateArrows, ...pvArrows].filter(Boolean);
+    const result = [];
+    const seen = new Set();
+
+    const bestCandidate = candidateList[0];
+    if (bestCandidate) {
+      const arrow = moveToArrow(bestCandidate.move, "#c6a25a", 10, 0.95);
+      if (arrow) {
+        const key = `${arrow.from}-${arrow.to}`;
+        seen.add(key);
+        result.push(arrow);
+      }
+    }
+
+    const pvPrimary = search.pv[0];
+    if (pvPrimary) {
+      const arrow = moveToArrow(pvPrimary, "#8f7a55", 7, 0.72);
+      if (arrow) {
+        const key = `${arrow.from}-${arrow.to}`;
+        if (!seen.has(key)) {
+          result.push(arrow);
+        }
+      }
+    }
+
+    return result;
   }, [candidateList, search.pv]);
 
   const trackedPieceDetail = useMemo(() => {
@@ -640,10 +669,16 @@ export default function App() {
   const loadFen = useCallback(async () => {
     try {
       setError("");
+      const normalizedFen = normalizeFenInput(fenDraft);
+      if (!normalizedFen) {
+        setError("Please enter a valid FEN.");
+        return;
+      }
       searchTokenRef.current += 1;
       closeSocket();
       clearSessionUiState();
-      await refreshPosition(fenDraft);
+      setFenDraft(normalizedFen);
+      await refreshPosition(normalizedFen);
     } catch (err) {
       setError(err.message);
     }

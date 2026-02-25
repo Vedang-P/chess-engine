@@ -5,6 +5,10 @@
 </p>
 
 <p align="center">
+  <img src="docs/visuals/ScreenRecording2026-02-25at8.18.26PMonline-video-cutter.com-ezgif.com-video-to-gif-converter.gif" alt="JANUS live demo" width="980" />
+</p>
+
+<p align="center">
   A classical chess engine with a real-time analysis interface that exposes search behavior, evaluation logic, and decision telemetry.
 </p>
 

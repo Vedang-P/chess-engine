@@ -135,6 +135,7 @@ export default function App() {
   const [timeMs, setTimeMs] = useState(2500);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [thinking, setThinking] = useState(false);
+  const [coldStartHintOpen, setColdStartHintOpen] = useState(false);
   const [showResultOverlay, setShowResultOverlay] = useState(false);
   const [search, setSearch] = useState(EMPTY_SEARCH);
   const [searchTimeline, setSearchTimeline] = useState([]);
@@ -190,7 +191,7 @@ export default function App() {
 
     const bestCandidate = candidateList[0];
     if (bestCandidate) {
-      const arrow = moveToArrow(bestCandidate.move, "#7fa650", 10, 0.88);
+      const arrow = moveToArrow(bestCandidate.move, "#7fa650", 8, 0.8);
       if (arrow) {
         const key = `${arrow.from}-${arrow.to}`;
         seen.add(key);
@@ -200,7 +201,7 @@ export default function App() {
 
     const pvPrimary = search.pv[0];
     if (pvPrimary) {
-      const arrow = moveToArrow(pvPrimary, "#7fa650", 7, 0.64);
+      const arrow = moveToArrow(pvPrimary, "#7fa650", 8, 0.8);
       if (arrow) {
         const key = `${arrow.from}-${arrow.to}`;
         if (!seen.has(key)) {
@@ -753,7 +754,7 @@ export default function App() {
 
           <div className="board-info-row">
             <span>{status === "ongoing" ? `${sideLabel(sideToMove)} to move` : status.toUpperCase()}</span>
-            <span>Eval (W) {formatEval(search.eval)}</span>
+            <span>Eval {formatEval(search.eval)}</span>
             <span>Depth {search.depth || 0}</span>
             <span>Nodes {search.nodes.toLocaleString()}</span>
             <span>NPS {search.nps.toLocaleString()}</span>
@@ -773,168 +774,188 @@ export default function App() {
 
         </section>
 
-        <section className="panel controls">
-          <div className="toolbar">
-            <button type="button" onClick={resetGame}>
-              New Game
+        <div className="controls-side">
+          <section className="panel controls">
+            <div className="toolbar">
+              <button type="button" onClick={resetGame}>
+                New Game
+              </button>
+              <button type="button" onClick={analyzeCurrentPosition} disabled={thinking}>
+                Analyze
+              </button>
+            </div>
+
+            <button type="button" onClick={() => setShowHeatmap((prev) => !prev)}>
+              Heatmap {showHeatmap ? "On" : "Off"}
             </button>
-            <button type="button" onClick={analyzeCurrentPosition} disabled={thinking}>
-              Analyze
-            </button>
-          </div>
 
-          <button type="button" onClick={() => setShowHeatmap((prev) => !prev)}>
-            Heatmap {showHeatmap ? "On" : "Off"}
-          </button>
+            <div className="compact-grid">
+              <label>
+                Side
+                <select value={humanSide} onChange={(event) => setHumanSide(event.target.value)}>
+                  <option value="white">White</option>
+                  <option value="black">Black</option>
+                </select>
+              </label>
 
-          <div className="compact-grid">
-            <label>
-              Side
-              <select value={humanSide} onChange={(event) => setHumanSide(event.target.value)}>
-                <option value="white">White</option>
-                <option value="black">Black</option>
-              </select>
-            </label>
+              <label>
+                Depth
+                <select value={maxDepth} onChange={(event) => setMaxDepth(Number(event.target.value))}>
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                  <option value={6}>6</option>
+                  <option value={7}>7</option>
+                  <option value={8}>8</option>
+                </select>
+              </label>
 
-            <label>
-              Depth
-              <select value={maxDepth} onChange={(event) => setMaxDepth(Number(event.target.value))}>
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-                <option value={4}>4</option>
-                <option value={5}>5</option>
-                <option value={6}>6</option>
-                <option value={7}>7</option>
-                <option value={8}>8</option>
-              </select>
-            </label>
+              <label className="time-control">
+                Time (ms)
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={timeMs}
+                  onChange={(event) => handleTimeInputChange(event.target.value)}
+                />
+                <div className="time-presets">
+                  {TIME_PRESETS_MS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      className={`time-chip ${timeMs === preset ? "active" : ""}`}
+                      onClick={() => setTimeMs(preset)}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </label>
+            </div>
 
-            <label className="time-control">
-              Time (ms)
+            <div className="info-section">
+              <h2>Principal Variation</h2>
+              <p className="pv-line">{formatPvLine(search.pv)}</p>
+            </div>
+
+            <div className="split-columns">
+              <div className="info-section">
+                <h2>Candidates</h2>
+                <div className="candidate-list">
+                  {candidateList.slice(0, 8).map((candidate, idx) => (
+                    <div className="candidate-row" key={`${candidate.move}-${idx}`}>
+                      <span>{idx + 1}</span>
+                      <span>{candidate.move}</span>
+                      <strong>{formatEval(candidate.eval)}</strong>
+                    </div>
+                  ))}
+                  {!candidateList.length && <p className="muted">No candidates</p>}
+                </div>
+              </div>
+
+              <div className="info-section">
+                <h2>Moves</h2>
+                <div className="move-table">
+                  {moveRows.map((row) => (
+                    <div key={`row-${row.number}`} className="move-table-row">
+                      <span className="move-no">{row.number}.</span>
+                      <span>{row.white || "-"}</span>
+                      <span>{row.black || "-"}</span>
+                    </div>
+                  ))}
+                  {!moveRows.length && <p className="muted">No moves</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="info-section">
+              <h2>Search Flow</h2>
+              <div className="search-flow-layout">
+                <div className="timeline-shell">
+                  <div className="timeline-bars">
+                    {searchTimeline.map((frame, idx) => {
+                      const h = Math.max(10, Math.min(58, 10 + Math.abs(frame.eval_cp || 0) / 20));
+                      const positive = (frame.eval_cp || 0) >= 0;
+                      return (
+                        <div
+                          key={`frame-${idx}`}
+                          className="timeline-bar"
+                          style={{ height: `${h}px`, background: positive ? "#b84f3a" : "#6f2f2f" }}
+                          title={`d${frame.depth} eval ${frame.eval_cp} nodes ${frame.nodes}`}
+                        />
+                      );
+                    })}
+                    {!searchTimeline.length && <span className="timeline-empty">No search data yet</span>}
+                  </div>
+                </div>
+                <p className="search-flow-note">
+                  Each bar is one live search snapshot. Taller bars mean stronger eval swings.
+                  Brighter bars favor White, darker bars favor Black.
+                </p>
+              </div>
+            </div>
+
+            <div className="info-section dynamic-value-panel">
+              <h2>Dynamic Value</h2>
+              <div className="dynamic-value-content">
+                {!trackedSquare && <p className="muted">Click a piece to inspect dynamic valuation.</p>}
+                {trackedSquare && !trackedPieceSymbol && (
+                  <p className="muted">{trackedSquare.toUpperCase()}: empty square</p>
+                )}
+                {trackedSquare && trackedPieceSymbol && (
+                  <div className="dynamic-value-grid">
+                    <span className="k">Square</span>
+                    <span>{trackedSquare.toUpperCase()}</span>
+                    <span className="k">Piece</span>
+                    <span>{trackedPieceName}</span>
+                    <span className="k">Dynamic</span>
+                    <span>{formatCp(trackedPieceDynamicValue)}</span>
+                    <span className="k">Base</span>
+                    <span>{formatCp(trackedPieceDetail?.base ?? BASE_VALUE_CP[trackedPieceSymbol.toLowerCase()] ?? 0)}</span>
+                    <span className="k">PST</span>
+                    <span>{formatCp(trackedPieceDetail?.pst ?? 0)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && <p className="error">{error}</p>}
+
+            <label className="fen-control fen-bottom">
+              FEN
               <input
+                className="fen-input"
                 type="text"
-                inputMode="numeric"
-                value={timeMs}
-                onChange={(event) => handleTimeInputChange(event.target.value)}
+                maxLength={120}
+                value={fenDraft}
+                onChange={(event) => setFenDraft(event.target.value)}
               />
-              <div className="time-presets">
-                {TIME_PRESETS_MS.map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    className={`time-chip ${timeMs === preset ? "active" : ""}`}
-                    onClick={() => setTimeMs(preset)}
-                  >
-                    {preset}
-                  </button>
-                ))}
-              </div>
+              <button type="button" onClick={loadFen}>
+                Load FEN
+              </button>
             </label>
-          </div>
+          </section>
 
-          <div className="info-section">
-            <h2>Principal Variation</h2>
-            <p className="pv-line">{formatPvLine(search.pv)}</p>
-          </div>
-
-          <div className="split-columns">
-            <div className="info-section">
-              <h2>Candidates</h2>
-              <div className="candidate-list">
-                {candidateList.slice(0, 8).map((candidate, idx) => (
-                  <div className="candidate-row" key={`${candidate.move}-${idx}`}>
-                    <span>{idx + 1}</span>
-                    <span>{candidate.move}</span>
-                    <strong>{formatEval(candidate.eval)}</strong>
-                  </div>
-                ))}
-                {!candidateList.length && <p className="muted">No candidates</p>}
-              </div>
-            </div>
-
-            <div className="info-section">
-              <h2>Moves</h2>
-              <div className="move-table">
-                {moveRows.map((row) => (
-                  <div key={`row-${row.number}`} className="move-table-row">
-                    <span className="move-no">{row.number}.</span>
-                    <span>{row.white || "-"}</span>
-                    <span>{row.black || "-"}</span>
-                  </div>
-                ))}
-                {!moveRows.length && <p className="muted">No moves</p>}
-              </div>
-            </div>
-          </div>
-
-          <div className="info-section">
-            <h2>Search Flow</h2>
-            <div className="search-flow-layout">
-              <div className="timeline-shell">
-                <div className="timeline-bars">
-                  {searchTimeline.map((frame, idx) => {
-                    const h = Math.max(10, Math.min(58, 10 + Math.abs(frame.eval_cp || 0) / 20));
-                    const positive = (frame.eval_cp || 0) >= 0;
-                    return (
-                      <div
-                        key={`frame-${idx}`}
-                        className="timeline-bar"
-                        style={{ height: `${h}px`, background: positive ? "#b84f3a" : "#6f2f2f" }}
-                        title={`d${frame.depth} eval ${frame.eval_cp} nodes ${frame.nodes}`}
-                      />
-                    );
-                  })}
-                  {!searchTimeline.length && <span className="timeline-empty">No search data yet</span>}
-                </div>
-              </div>
-              <p className="search-flow-note">
-                Each bar is one live search snapshot. Taller bars mean stronger eval swings.
-                Brighter bars favor White, darker bars favor Black.
-              </p>
-            </div>
-          </div>
-
-          <div className="info-section dynamic-value-panel">
-            <h2>Dynamic Value</h2>
-            <div className="dynamic-value-content">
-              {!trackedSquare && <p className="muted">Click a piece to inspect dynamic valuation.</p>}
-              {trackedSquare && !trackedPieceSymbol && (
-                <p className="muted">{trackedSquare.toUpperCase()}: empty square</p>
-              )}
-              {trackedSquare && trackedPieceSymbol && (
-                <div className="dynamic-value-grid">
-                  <span className="k">Square</span>
-                  <span>{trackedSquare.toUpperCase()}</span>
-                  <span className="k">Piece</span>
-                  <span>{trackedPieceName}</span>
-                  <span className="k">Dynamic</span>
-                  <span>{formatCp(trackedPieceDynamicValue)}</span>
-                  <span className="k">Base</span>
-                  <span>{formatCp(trackedPieceDetail?.base ?? BASE_VALUE_CP[trackedPieceSymbol.toLowerCase()] ?? 0)}</span>
-                  <span className="k">PST</span>
-                  <span>{formatCp(trackedPieceDetail?.pst ?? 0)}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {error && <p className="error">{error}</p>}
-
-          <label className="fen-control fen-bottom">
-            FEN
-            <input
-              className="fen-input"
-              type="text"
-              maxLength={120}
-              value={fenDraft}
-              onChange={(event) => setFenDraft(event.target.value)}
-            />
-            <button type="button" onClick={loadFen}>
-              Load FEN
+          <aside
+            className={`coldstart-help ${coldStartHintOpen ? "open" : ""}`}
+            onMouseLeave={() => setColdStartHintOpen(false)}
+          >
+            <button
+              type="button"
+              className="coldstart-help-trigger"
+              aria-label="Cold start help"
+              onClick={() => setColdStartHintOpen((prev) => !prev)}
+            >
+              ?
             </button>
-          </label>
-        </section>
+            <p className="coldstart-help-tip">
+              If the backend has been idle for a while, the first engine response can take around
+              30 seconds because of cold start. Please wait.
+            </p>
+          </aside>
+        </div>
       </main>
 
       <section className="panel legend-panel">

@@ -186,14 +186,14 @@ export default function ChessBoard({
         <marker
           id="arrowHead"
           viewBox="0 0 12 12"
-          markerWidth="9"
-          markerHeight="9"
-          refX="9.5"
+          markerWidth="3.2"
+          markerHeight="3.2"
+          refX="10.4"
           refY="6"
-          markerUnits="userSpaceOnUse"
+          markerUnits="strokeWidth"
           orient="auto"
         >
-          <path d="M1 1 L11 6 L1 11 Z" fill="#7fa650" />
+          <path d="M0.8 0.8 L11.2 6 L0.8 11.2 Z" fill="#7fa650" stroke="none" />
         </marker>
       </defs>
 
@@ -342,25 +342,6 @@ export default function ChessBoard({
         );
       })}
 
-      {arrows.map((arrow, idx) => {
-        const from = squareToDisplayCoords(arrow.from, size, orientation);
-        const to = squareToDisplayCoords(arrow.to, size, orientation);
-        return (
-          <line
-            key={`${arrow.from}-${arrow.to}-${idx}`}
-            x1={from.x}
-            y1={from.y}
-            x2={to.x}
-            y2={to.y}
-            stroke={arrow.color || "#7fa650"}
-            strokeWidth={arrow.width || 8}
-            strokeLinecap="round"
-            markerEnd="url(#arrowHead)"
-            opacity={arrow.opacity || 0.82}
-          />
-        );
-      })}
-
       {Array.from({ length: 64 }).map((_, displayIndex) => {
         const boardIndex = displaySquareToBoardIndex(displayIndex, orientation);
         const square = indexToSquare(boardIndex);
@@ -402,6 +383,33 @@ export default function ChessBoard({
           />
         </g>
       )}
+
+      {arrows.map((arrow, idx) => {
+        const from = squareToDisplayCoords(arrow.from, size, orientation);
+        const to = squareToDisplayCoords(arrow.to, size, orientation);
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const headOffset = 12;
+        const x2 = to.x - (dx / len) * headOffset;
+        const y2 = to.y - (dy / len) * headOffset;
+
+        return (
+          <line
+            key={`${arrow.from}-${arrow.to}-${idx}`}
+            x1={from.x}
+            y1={from.y}
+            x2={x2}
+            y2={y2}
+            stroke={arrow.color || "#7fa650"}
+            strokeWidth={arrow.width || 8}
+            strokeLinecap="round"
+            markerEnd="url(#arrowHead)"
+            opacity={arrow.opacity || 0.82}
+            pointerEvents="none"
+          />
+        );
+      })}
 
       {(orientation === "white" ? FILES : FILES.split("").reverse().join("")).split("").map((file, idx) => (
         <text key={`file-${file}`} x={idx * cell + 8} y={size - 8} className="coord">

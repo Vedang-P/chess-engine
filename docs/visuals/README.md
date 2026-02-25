@@ -17,6 +17,7 @@ All repository visuals live in this folder and use a shared visual style:
 - `performance-charts.svg`
 
 ## Demo GIFs
+- `demo-hero.gif`
 - `demo-play-engine.gif`
 - `demo-heatmap-toggle.gif`
 - `demo-dynamic-value.gif`

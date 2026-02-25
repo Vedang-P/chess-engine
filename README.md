@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/visuals/ScreenRecording2026-02-25at8.18.26PMonline-video-cutter.com-ezgif.com-video-to-gif-converter.gif" alt="JANUS live demo" width="980" />
+  <img src="docs/visuals/demo-hero.gif" alt="JANUS live demo" width="980" />
 </p>
 
 ## What JANUS Shows

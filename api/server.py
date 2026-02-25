@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -43,10 +45,16 @@ class ResetRequest(BaseModel):
 
 app = FastAPI(title="Chess Engine API", version="0.2.0")
 
+raw_origins = os.getenv("CORS_ORIGINS", "*").strip()
+if not raw_origins or raw_origins == "*":
+    cors_origins = ["*"]
+else:
+    cors_origins = [item.strip() for item in raw_origins.split(",") if item.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -121,6 +129,11 @@ def _apply_uci_move(board: Board, wanted: str) -> str:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"service": "janus-chess-engine", "status": "ok"}
 
 
 @app.post("/analyze")

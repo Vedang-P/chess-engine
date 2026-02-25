@@ -99,7 +99,7 @@ def _draw_board(draw: ImageDraw.ImageDraw, pieces: dict[str, str], heat: dict[st
 
 def _draw_eval(draw: ImageDraw.ImageDraw, cp: int, thinking: bool = False) -> None:
     draw.text((720, 110), "EVALUATION", fill=COLORS["gold"], font=FONT_BODY)
-    draw.text((720, 145), f"Eval (W): {cp:+d} cp", fill=COLORS["text"], font=FONT_MONO)
+    draw.text((720, 145), f"Eval: {cp:+d} cp", fill=COLORS["text"], font=FONT_MONO)
     draw.rounded_rectangle((720, 185, 1020, 209), radius=12, fill="#0f0f0f", outline=COLORS["border"], width=1)
     fill_w = int((cp + 900) / 1800 * 296)
     fill_w = max(2, min(296, fill_w))

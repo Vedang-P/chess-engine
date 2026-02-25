@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960" role="img" aria-label="JANUS architecture diagram">
+  <defs>
+    <style>
+      .bg { fill: #161616; }
+      .panel { fill: #1e1e1e; stroke: #2b2b2b; stroke-width: 2; rx: 18; }
+      .title { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 44px; font-weight: 600; }
+      .subtitle { fill: #c6a25a; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 20px; font-weight: 500; }
+      .h { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 24px; font-weight: 600; }
+      .t { fill: #cfcabf; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 18px; }
+      .edge { stroke: #c6a25a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .edge-muted { stroke: #6b665c; stroke-width: 2; fill: none; marker-end: url(#arrowMuted); }
+      .chip { fill: #262626; stroke: #2f2f2f; stroke-width: 1.5; rx: 10; }
+      .chip-text { fill: #d9d3c7; font-family: "IBM Plex Mono", monospace; font-size: 15px; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+      <path d="M0,0 L0,12 L10,6 z" fill="#c6a25a" />
+    </marker>
+    <marker id="arrowMuted" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto">
+      <path d="M0,0 L0,12 L10,6 z" fill="#6b665c" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="960" />
+  <text class="title" x="70" y="82">JANUS System Architecture</text>
+  <text class="subtitle" x="70" y="116">Frontend visualization, FastAPI orchestration, and engine core</text>
+
+  <rect class="panel" x="70" y="170" width="360" height="250" />
+  <text class="h" x="100" y="220">Client</text>
+  <text class="t" x="100" y="258">React + Vite UI</text>
+  <text class="t" x="100" y="288">SVG board renderer</text>
+  <text class="t" x="100" y="318">Eval / PV / heatmap panels</text>
+  <rect class="chip" x="100" y="342" width="300" height="40" />
+  <text class="chip-text" x="118" y="368">/frontend/src/App.jsx</text>
+
+  <rect class="panel" x="620" y="170" width="360" height="250" />
+  <text class="h" x="650" y="220">API Layer</text>
+  <text class="t" x="650" y="258">FastAPI endpoints</text>
+  <text class="t" x="650" y="288">Move validation + game state I/O</text>
+  <text class="t" x="650" y="318">WS streaming endpoint</text>
+  <rect class="chip" x="650" y="342" width="300" height="40" />
+  <text class="chip-text" x="668" y="368">/api/server.py + websocket.py</text>
+
+  <rect class="panel" x="1170" y="170" width="360" height="250" />
+  <text class="h" x="1200" y="220">Engine Core</text>
+  <text class="t" x="1200" y="258">Bitboards + legal movegen</text>
+  <text class="t" x="1200" y="288">Alpha-beta search</text>
+  <text class="t" x="1200" y="318">Handcrafted evaluation</text>
+  <rect class="chip" x="1200" y="342" width="300" height="40" />
+  <text class="chip-text" x="1218" y="368">/engine/*</text>
+
+  <rect class="panel" x="360" y="520" width="420" height="260" />
+  <text class="h" x="392" y="570">REST Channel</text>
+  <text class="t" x="392" y="608">POST /move</text>
+  <text class="t" x="392" y="638">POST /legal-moves</text>
+  <text class="t" x="392" y="668">POST /engine-move, /analyze</text>
+  <text class="t" x="392" y="698">POST /reset, /perft</text>
+
+  <rect class="panel" x="860" y="520" width="420" height="260" />
+  <text class="h" x="892" y="570">Streaming Channel</text>
+  <text class="t" x="892" y="608">WS /ws/search</text>
+  <text class="t" x="892" y="638">snapshot: depth, nodes, PV, eval</text>
+  <text class="t" x="892" y="668">complete: best move, final stats</text>
+  <text class="t" x="892" y="698">error: fail-safe fallback path</text>
+
+  <path class="edge" d="M430 295 L620 295" />
+  <path class="edge" d="M980 295 L1170 295" />
+  <path class="edge-muted" d="M250 420 L500 520" />
+  <path class="edge-muted" d="M800 420 L560 520" />
+  <path class="edge-muted" d="M800 420 L1060 520" />
+  <path class="edge-muted" d="M1350 420 L1110 520" />
+
+  <rect class="panel" x="70" y="830" width="1460" height="84" />
+  <text class="t" x="100" y="880">Runtime loop: user move -> API validation -> engine search -> streamed telemetry -> UI visualization -> next move</text>
+</svg>

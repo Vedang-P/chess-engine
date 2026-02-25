@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="940" viewBox="0 0 1600 940" role="img" aria-label="Evaluation breakdown diagram">
+  <defs>
+    <style>
+      .bg { fill: #161616; }
+      .panel { fill: #1e1e1e; stroke: #2b2b2b; stroke-width: 2; rx: 16; }
+      .title { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 44px; font-weight: 600; }
+      .subtitle { fill: #c6a25a; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 20px; font-weight: 500; }
+      .h { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 24px; font-weight: 600; }
+      .t { fill: #d1ccc2; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 18px; }
+      .mono { fill: #c6a25a; font-family: "IBM Plex Mono", monospace; font-size: 20px; }
+      .edge { stroke: #c6a25a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L0,12 L10,6 z" fill="#c6a25a" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="940" />
+  <text class="title" x="70" y="82">Evaluation Breakdown</text>
+  <text class="subtitle" x="70" y="116">Centipawn score built from interpretable chess terms</text>
+
+  <rect class="panel" x="70" y="170" width="270" height="170" />
+  <text class="h" x="100" y="220">Material</text>
+  <text class="t" x="100" y="255">Base piece values</text>
+  <text class="mono" x="100" y="295">P=100 N=320 B=330</text>
+
+  <rect class="panel" x="380" y="170" width="270" height="170" />
+  <text class="h" x="410" y="220">Piece-Square</text>
+  <text class="t" x="410" y="255">PST positional bonuses</text>
+  <text class="mono" x="410" y="295">table[square]</text>
+
+  <rect class="panel" x="690" y="170" width="270" height="170" />
+  <text class="h" x="720" y="220">Mobility</text>
+  <text class="t" x="720" y="255">Reachable targets</text>
+  <text class="mono" x="720" y="295">attacks * weight</text>
+
+  <rect class="panel" x="1000" y="170" width="270" height="170" />
+  <text class="h" x="1030" y="220">King Safety</text>
+  <text class="t" x="1030" y="255">Shield + attack ring</text>
+  <text class="mono" x="1030" y="295">pawn cover / pressure</text>
+
+  <rect class="panel" x="1310" y="170" width="220" height="170" />
+  <text class="h" x="1340" y="220">Pawn Structure</text>
+  <text class="t" x="1340" y="255">doubled / isolated</text>
+  <text class="mono" x="1340" y="295">passed bonuses</text>
+
+  <path class="edge" d="M205 340 C205 470, 580 470, 580 580" />
+  <path class="edge" d="M515 340 C515 470, 640 470, 640 580" />
+  <path class="edge" d="M825 340 C825 470, 700 470, 700 580" />
+  <path class="edge" d="M1135 340 C1135 470, 760 470, 760 580" />
+  <path class="edge" d="M1420 340 C1420 470, 820 470, 820 580" />
+
+  <rect class="panel" x="520" y="580" width="560" height="220" />
+  <text class="h" x="560" y="640">Final Score Assembly</text>
+  <text class="mono" x="560" y="690">white_total - black_total = white_minus_black</text>
+  <text class="mono" x="560" y="730">score_cp = side_to_move == white ? +x : -x</text>
+  <text class="t" x="560" y="770">Detailed maps emitted: piece_values, piece_breakdown, heatmap</text>
+
+  <rect class="panel" x="70" y="840" width="1460" height="70" />
+  <text class="t" x="100" y="884">All terms are exposed to UI for explainability, not just final eval.</text>
+</svg>

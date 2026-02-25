@@ -1,118 +1,132 @@
 # JANUS: Chess Engine + Live Analysis Platform
 
 <p align="center">
-  <img src="frontend/public/janus-logo.jpg" alt="JANUS logo" width="180" />
+  <img src="frontend/public/janus-logo.jpg" alt="JANUS logo" width="220" />
 </p>
 
-**JANUS** is a classical chess engine with a real-time web visualization interface.
+<p align="center">
+  A classical chess engine with a real-time analysis interface that exposes search behavior, evaluation logic, and decision telemetry.
+</p>
 
-It combines:
-- **Engine fundamentals** (bitboards, legal move generation, perft-tested correctness)
-- **Search + evaluation** (live PV, candidate moves, eval trends, piece breakdowns)
+## What JANUS Shows
+JANUS is designed to make engine decisions understandable, not opaque.
 
+- Legal move generation built on reversible make/unmake state transitions
+- Perft-verified correctness on known reference positions
+- Iterative deepening alpha-beta search with live instrumentation
+- Explainable evaluation breakdown (material, PST, mobility, king safety, pawn structure)
+- Interactive board overlays: PV arrows, candidate ranking, heatmap, dynamic piece values
 
-## What This Project Does
-JANUS lets you:
-1. Run live engine analysis in real time.
-2. See *why* the engine prefers a move through visual telemetry and dynamic piece valuation.
+## Visuals
+All visual assets live in [`docs/visuals/`](docs/visuals).
 
-Unlike opaque chess bots, JANUS exposes internal search behavior as the engine thinks.
+### 1) Architecture
+![JANUS Architecture](docs/visuals/architecture.svg)
 
-## Core Capabilities
-- 64-bit bitboard board representation
-- Full legal move generation with make/unmake
-- Perft correctness testing against known reference values
-- Iterative deepening negamax + alpha-beta pruning
-- Time-controlled search
-- Handcrafted centipawn evaluation:
-  - material
-  - piece-square tables
-  - mobility
-  - king safety
-  - pawn structure
-- Live instrumentation stream over WebSocket
-- Interactive React + SVG analysis UI with:
-  - search flow graph
-  - principal variation
-  - candidate move rankings
-  - dynamic piece value inspection
-  - board heatmaps
-
-## Tech Stack
-- **Backend:** Python 3.11+, FastAPI, Uvicorn
-- **Frontend:** React (Vite), SVG rendering
-- **Engine:** Custom implementation 
-- **Transport:** REST + WebSockets
-
-## Repository Structure
-```text
-chess_engine/
-├── api/                  # FastAPI server + websocket routes
-├── engine/               # Core chess engine modules
-├── frontend/             # React app (Vite)
-├── tests/                # Perft + movegen + integration tests
-├── docs/images/          # Visual assets for docs
-├── Dockerfile            # Backend container
-├── render.yaml           # Render service config
-└── README.md
+```mermaid
+flowchart LR
+  U["User move on board"] --> FE["React UI state"]
+  FE --> API["FastAPI /move + /legal-moves"]
+  API --> ENG["Engine board + movegen"]
+  FE --> WS["WebSocket /ws/search"]
+  WS --> SEARCH["Iterative deepening alpha-beta"]
+  SEARCH --> SNAP["Snapshots: depth, nodes, PV, candidates, heatmap"]
+  SNAP --> FE
+  SEARCH --> DONE["Complete: best move + eval"]
+  DONE --> FE
 ```
 
-## Local Setup
-### Prerequisites
-- Python **3.11+**
-- Node.js **18+** (or newer)
-- npm
+### 2) Search Lifecycle
+![Search Lifecycle](docs/visuals/search-lifecycle.svg)
 
-### 1) Clone and install backend
+### 3) Movegen Pipeline
+![Movegen Pipeline](docs/visuals/movegen-pipeline.svg)
+
+```mermaid
+flowchart LR
+  PSEUDO["Generate pseudo-legal moves"] --> MAKE["Make move"]
+  MAKE --> CHECK["King safety check"]
+  CHECK --> UNMAKE["Unmake move"]
+  UNMAKE --> KEEP["Keep only legal moves"]
+```
+
+### 4) Evaluation Breakdown
+![Evaluation Breakdown](docs/visuals/evaluation-breakdown.svg)
+
+### 5) Performance Charts (Generated from CSV)
+![Performance Charts](docs/visuals/performance-charts.svg)
+
+### Demo GIFs
+| Demo | Preview |
+|---|---|
+| Play move + engine response | ![Play and engine response](docs/visuals/demo-play-engine.gif) |
+| Heatmap toggle | ![Heatmap toggle](docs/visuals/demo-heatmap-toggle.gif) |
+| Dynamic value click tracking | ![Dynamic value](docs/visuals/demo-dynamic-value.gif) |
+
+## Tech Stack
+- **Engine:** Custom Python implementation (bitboards, legal movegen, search, evaluation)
+- **Backend:** FastAPI + Uvicorn + WebSockets
+- **Frontend:** React (Vite), SVG board rendering
+- **Testing:** Pytest perft + movegen + search + evaluation tests
+
+## Quick Start
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+
+### Install
 ```bash
-cd /path/to/your/workspace
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```
 
-### 2) Install frontend
-```bash
 cd frontend
 npm install
 cd ..
 ```
 
-## Run Locally
-Open two terminals.
-
-### Terminal A: backend
+### Run locally
+Terminal A (backend):
 ```bash
-cd /path/to/<your-repo>
 source .venv/bin/activate
 python3 -m uvicorn api.server:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### Terminal B: frontend
+Terminal B (frontend):
 ```bash
-cd /path/to/<your-repo>/frontend
+cd frontend
 cp .env.example .env
 npm run dev
 ```
 
-Open the frontend URL shown by Vite (usually `http://127.0.0.1:5173`).
+## Reproducible Benchmarks and Visuals
+Install visualization dependencies (one-time):
+```bash
+pip install -r requirements-docs.txt
+```
 
-## How to Use 
-1. Start a new game from the right panel.
-2. Move pieces by drag-and-drop or click-to-move.
-3. Click **Analyze** to run engine evaluation for the current position.
-4. Use **Heatmap On/Off** to toggle board heat overlays.
-5. Click any piece to lock its **Dynamic Value** panel.
-   - Click another piece to switch tracking.
-   - Click the same tracked piece again to deselect.
+Generate benchmark CSV files:
+```bash
+python3 scripts/bench.py
+```
 
-## Correctness and Testing
-Engine correctness is validated with perft tests.
+Render performance chart SVG from CSV:
+```bash
+python3 scripts/plot_metrics.py
+```
 
-Known results:
+Regenerate demo GIF pack:
+```bash
+python3 scripts/generate_demo_gifs.py
+```
 
+Outputs:
+- `docs/metrics/perft_metrics.csv`
+- `docs/metrics/search_metrics.csv`
+- `docs/visuals/performance-charts.svg`
+- `docs/visuals/demo-*.gif`
+
+## Correctness (Perft)
 | Position | Depth | Expected | Actual |
 |---|---:|---:|---:|
 | Start position | 1 | 20 | 20 |
@@ -122,19 +136,29 @@ Known results:
 | Kiwipete | 2 | 2039 | 2039 |
 | Kiwipete | 3 | 97862 | 97862 |
 
-Run all tests:
+Run full test suite:
 ```bash
 python3 -m pytest -q
 ```
 
-## Performance Snapshot (Local)
-Example measurements on this implementation:
-- Search benchmark (start position, `max_depth=5`, `time_limit_ms=4000`)
-  - completed depth: `3`
-  - nodes: `3084`
-  - nps: `5804`
-  - elapsed: `531 ms`
-- Perft benchmark (start position, depth 4)
-  - nodes: `197281`
-  - elapsed: `2555 ms`
-  - nps: `77213`
+## Repository Layout
+```text
+api/                FastAPI endpoints + websocket streaming
+engine/             bitboards, board, movegen, perft, search, evaluation
+frontend/           React + SVG visualization app
+tests/              correctness and behavior tests
+scripts/            benchmark + plotting + gif generation scripts
+docs/metrics/       generated benchmark CSV files
+docs/visuals/       architecture/search/eval SVGs + demo GIFs
+```
+
+## Limitations
+- No opening book or endgame tablebase integration yet
+- No transposition table / quiescence search yet
+- Current demo GIFs are generated walkthrough assets, not screen-captured gameplay sessions
+
+## Roadmap
+- Add transposition table and move ordering heuristics (killer/history)
+- Add quiescence search to stabilize tactical evaluation
+- Add real captured product GIFs from deployed UI sessions
+- Add automated benchmark history tracking across commits

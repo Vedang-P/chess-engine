@@ -37,6 +37,14 @@ export function movePosition(fen, move) {
   return post("/move", { fen, move });
 }
 
+export function analyzePosition(fen, maxDepth, timeLimitMs) {
+  return post("/analyze", { fen, max_depth: maxDepth, time_limit_ms: timeLimitMs });
+}
+
+export function engineMovePosition(fen, maxDepth, timeLimitMs) {
+  return post("/engine-move", { fen, max_depth: maxDepth, time_limit_ms: timeLimitMs });
+}
+
 export function resetPosition(fen) {
   if (!fen) {
     return post("/reset", {});

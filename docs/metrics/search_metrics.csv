@@ -1,0 +1,11 @@
+position,depth_limit,reached_depth,nodes,elapsed_ms,nps,cutoffs,best_move,eval_cp
+start,1,1,20,4.162,4805,0,e2e4,56
+start,2,2,245,44.67,5484,13,e2e4,0
+start,3,3,3084,540.987,5700,136,d2d4,56
+start,4,3,3084,533.544,5780,136,d2d4,56
+start,5,3,3084,538.675,5725,136,d2d4,56
+open_after_e4,1,1,20,4.288,4663,0,e7e5,0
+open_after_e4,2,2,271,53.665,5049,14,e7e5,-54
+open_after_e4,3,3,2782,528.976,5259,219,g8f6,51
+open_after_e4,4,3,2782,540.634,5145,219,g8f6,51
+open_after_e4,5,3,2782,526.513,5283,219,g8f6,51

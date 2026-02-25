@@ -1,0 +1,8 @@
+position,depth,nodes,elapsed_ms,nps
+start,1,20,0.245,81757
+start,2,400,5.445,73457
+start,3,8902,102.26,87053
+start,4,197281,2579.297,76486
+kiwipete,1,48,0.688,69754
+kiwipete,2,2039,33.405,61038
+kiwipete,3,97862,2256.773,43363

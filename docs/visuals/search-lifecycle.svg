@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Search lifecycle diagram">
+  <defs>
+    <style>
+      .bg { fill: #161616; }
+      .title { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 44px; font-weight: 600; }
+      .subtitle { fill: #c6a25a; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 20px; font-weight: 500; }
+      .step { fill: #1e1e1e; stroke: #2b2b2b; stroke-width: 2; rx: 16; }
+      .step-title { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 24px; font-weight: 600; }
+      .step-text { fill: #d0cbc1; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 18px; }
+      .idx { fill: #c6a25a; font-family: "IBM Plex Mono", monospace; font-size: 20px; font-weight: 600; }
+      .arrow { stroke: #c6a25a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L0,12 L10,6 z" fill="#c6a25a" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="900" />
+  <text class="title" x="70" y="82">Search Lifecycle</text>
+  <text class="subtitle" x="70" y="116">How one move turns into live analysis and engine response</text>
+
+  <rect class="step" x="70" y="180" width="270" height="210" />
+  <text class="idx" x="96" y="220">01</text>
+  <text class="step-title" x="96" y="258">Player Move</text>
+  <text class="step-text" x="96" y="292">User drags/clicks piece</text>
+  <text class="step-text" x="96" y="320">UI resolves UCI move</text>
+
+  <rect class="step" x="390" y="180" width="270" height="210" />
+  <text class="idx" x="416" y="220">02</text>
+  <text class="step-title" x="416" y="258">Legal Update</text>
+  <text class="step-text" x="416" y="292">POST /move</text>
+  <text class="step-text" x="416" y="320">Backend returns new FEN</text>
+
+  <rect class="step" x="710" y="180" width="270" height="210" />
+  <text class="idx" x="736" y="220">03</text>
+  <text class="step-title" x="736" y="258">Search Start</text>
+  <text class="step-text" x="736" y="292">WS /ws/search opens</text>
+  <text class="step-text" x="736" y="320">depth + time controls sent</text>
+
+  <rect class="step" x="1030" y="180" width="270" height="210" />
+  <text class="idx" x="1056" y="220">04</text>
+  <text class="step-title" x="1056" y="258">Live Snapshots</text>
+  <text class="step-text" x="1056" y="292">depth, nodes, nps, cutoffs</text>
+  <text class="step-text" x="1056" y="320">PV + candidates + heatmap</text>
+
+  <rect class="step" x="1330" y="180" width="200" height="210" />
+  <text class="idx" x="1356" y="220">05</text>
+  <text class="step-title" x="1356" y="258">Complete</text>
+  <text class="step-text" x="1356" y="292">best move + final eval</text>
+  <text class="step-text" x="1356" y="320">UI applies engine move</text>
+
+  <path class="arrow" d="M340 285 L390 285" />
+  <path class="arrow" d="M660 285 L710 285" />
+  <path class="arrow" d="M980 285 L1030 285" />
+  <path class="arrow" d="M1300 285 L1330 285" />
+
+  <rect class="step" x="70" y="470" width="1460" height="300" />
+  <text class="step-title" x="110" y="530">Telemetry surfaced in UI per cycle</text>
+  <text class="step-text" x="110" y="575">- Eval capsule (white-centric)</text>
+  <text class="step-text" x="110" y="610">- Principal variation and candidate rankings</text>
+  <text class="step-text" x="110" y="645">- Search flow bars and dynamic value panel</text>
+  <text class="step-text" x="110" y="680">- Heatmap overlay + current move highlight</text>
+  <text class="step-text" x="110" y="715">- Fail-safe fallback to HTTP /engine-move or /analyze if websocket stalls</text>
+</svg>

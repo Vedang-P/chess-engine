@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ChessBoard from "./components/ChessBoard";
-import { API_BASE, createSearchSocket, fetchLegalMoves, movePosition, resetPosition } from "./lib/api";
+import {
+  analyzePosition,
+  createSearchSocket,
+  engineMovePosition,
+  fetchLegalMoves,
+  movePosition,
+  resetPosition
+} from "./lib/api";
 import { formatEval, moveToArrow, parseFenBoard, pieceColor, squareToIndex } from "./lib/chess";
 
 const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -249,11 +256,84 @@ export default function App() {
     [applyPosition]
   );
 
+  const buildSearchView = useCallback((payload, whiteSign) => {
+    const evalCpWhite = (payload.eval_cp ?? 0) * whiteSign;
+    const evalWhite = normalizeScore((payload.eval ?? 0) * whiteSign);
+    const candidateMovesWhite = Object.fromEntries(
+      Object.entries(payload.candidate_moves || {}).map(([move, evalScore]) => [
+        move,
+        normalizeScore(Number(evalScore) * whiteSign)
+      ])
+    );
+
+    return {
+      depth: payload.depth || 0,
+      eval: evalWhite,
+      eval_cp: evalCpWhite,
+      nodes: payload.nodes || 0,
+      nps: payload.nps || 0,
+      cutoffs: payload.cutoffs || 0,
+      elapsed_ms: payload.elapsed_ms || 0,
+      current_move: payload.current_move || "",
+      pv: payload.pv || [],
+      candidate_moves: candidateMovesWhite,
+      piece_values: payload.piece_values || {},
+      piece_breakdown: payload.piece_breakdown || {},
+      heatmap: payload.heatmap || {}
+    };
+  }, []);
+
+  const runHttpFallbackSearch = useCallback(
+    async (positionFen, whiteSign, autoPlayBestMove, token) => {
+      try {
+        const payload = autoPlayBestMove
+          ? await engineMovePosition(positionFen, maxDepth, timeMs)
+          : await analyzePosition(positionFen, maxDepth, timeMs);
+        if (token !== searchTokenRef.current) return;
+
+        if (autoPlayBestMove && payload.best_move) {
+          applyPosition(payload);
+          setLastMove({ from: payload.best_move.slice(0, 2), to: payload.best_move.slice(2, 4) });
+          setMoveLog((prev) => [...prev, { by: "engine", move: payload.best_move }]);
+          setTrackedSquare((prev) => {
+            if (!prev) return prev;
+            if (prev === payload.best_move.slice(0, 2)) return payload.best_move.slice(2, 4);
+            return prev;
+          });
+        }
+
+        const view = buildSearchView(payload, whiteSign);
+        setSearch(view);
+        setSearchTimeline((prev) => {
+          const next = [
+            ...prev,
+            {
+              eval_cp: view.eval_cp ?? 0,
+              nodes: view.nodes,
+              depth: view.depth,
+              cutoffs: view.cutoffs
+            }
+          ];
+          return next.slice(-64);
+        });
+      } catch (err) {
+        if (token !== searchTokenRef.current) return;
+        setError(err.message || "Fallback search failed.");
+      } finally {
+        if (token === searchTokenRef.current) {
+          setThinking(false);
+        }
+      }
+    },
+    [analyzePosition, applyPosition, buildSearchView, engineMovePosition, maxDepth, timeMs]
+  );
+
   const startLiveSearch = useCallback(
     (positionFen, { autoPlayBestMove }) => {
       const token = ++searchTokenRef.current;
       const rootSide = positionFen.split(" ")[1] === "b" ? "b" : "w";
       const whiteSign = rootSide === "w" ? 1 : -1;
+      const watchdogMs = Math.max(4000, timeMs + 3500);
       setThinking(true);
       setError("");
       setSearch({ ...EMPTY_SEARCH });
@@ -263,9 +343,37 @@ export default function App() {
 
       const socket = createSearchSocket();
       let completed = false;
+      let fallbackStarted = false;
+      let watchdogId = null;
+
+      const clearWatchdog = () => {
+        if (watchdogId !== null) {
+          window.clearTimeout(watchdogId);
+          watchdogId = null;
+        }
+      };
+
+      const startHttpFallback = () => {
+        if (fallbackStarted || completed || token !== searchTokenRef.current) return;
+        fallbackStarted = true;
+        completed = true;
+        clearWatchdog();
+        closeSocket();
+        runHttpFallbackSearch(positionFen, whiteSign, autoPlayBestMove, token);
+      };
+
+      const armWatchdog = () => {
+        clearWatchdog();
+        watchdogId = window.setTimeout(() => {
+          startHttpFallback();
+        }, watchdogMs);
+      };
+
       wsRef.current = socket;
+      armWatchdog();
 
       socket.onopen = () => {
+        armWatchdog();
         socket.send(
           JSON.stringify({
             fen: positionFen,
@@ -280,44 +388,23 @@ export default function App() {
         if (token !== searchTokenRef.current) return;
 
         const data = JSON.parse(event.data);
+        armWatchdog();
         if (data.type === "snapshot") {
           const now = Date.now();
           if (now - lastSnapshotUiUpdateRef.current < 120) {
             return;
           }
           lastSnapshotUiUpdateRef.current = now;
-          const evalCpWhite = (data.eval_cp ?? 0) * whiteSign;
-          const evalWhite = normalizeScore((data.eval ?? 0) * whiteSign);
-          const candidateMovesWhite = Object.fromEntries(
-            Object.entries(data.candidate_moves || {}).map(([move, evalScore]) => [
-              move,
-              normalizeScore(Number(evalScore) * whiteSign)
-            ])
-          );
-
-          setSearch({
-            depth: data.depth,
-            eval: evalWhite,
-            eval_cp: evalCpWhite,
-            nodes: data.nodes,
-            nps: data.nps,
-            cutoffs: data.cutoffs,
-            elapsed_ms: data.elapsed_ms,
-            current_move: data.current_move || "",
-            pv: data.pv || [],
-            candidate_moves: candidateMovesWhite,
-            piece_values: data.piece_values || {},
-            piece_breakdown: data.piece_breakdown || {},
-            heatmap: data.heatmap || {}
-          });
+          const view = buildSearchView(data, whiteSign);
+          setSearch(view);
           setSearchTimeline((prev) => {
             const next = [
               ...prev,
               {
-                eval_cp: evalCpWhite,
-                nodes: data.nodes,
-                depth: data.depth,
-                cutoffs: data.cutoffs
+                eval_cp: view.eval_cp ?? 0,
+                nodes: view.nodes,
+                depth: view.depth,
+                cutoffs: view.cutoffs
               }
             ];
             return next.slice(-64);
@@ -327,29 +414,8 @@ export default function App() {
 
         if (data.type === "complete") {
           completed = true;
-          const evalCpWhite = (data.eval_cp ?? 0) * whiteSign;
-          const evalWhite = normalizeScore((data.eval ?? 0) * whiteSign);
-          const candidateMovesWhite = Object.fromEntries(
-            Object.entries(data.candidate_moves || {}).map(([move, evalScore]) => [
-              move,
-              normalizeScore(Number(evalScore) * whiteSign)
-            ])
-          );
-          setSearch({
-            depth: data.depth,
-            eval: evalWhite,
-            eval_cp: evalCpWhite,
-            nodes: data.nodes,
-            nps: data.nps,
-            cutoffs: data.cutoffs,
-            elapsed_ms: data.elapsed_ms,
-            current_move: data.current_move || "",
-            pv: data.pv || [],
-            candidate_moves: candidateMovesWhite,
-            piece_values: data.piece_values || {},
-            piece_breakdown: data.piece_breakdown || {},
-            heatmap: data.heatmap || {}
-          });
+          clearWatchdog();
+          setSearch(buildSearchView(data, whiteSign));
 
           if (autoPlayBestMove && data.best_move) {
             try {
@@ -365,15 +431,25 @@ export default function App() {
         }
 
         if (data.type === "error") {
-          completed = true;
-          setError(data.message || "Search failed.");
-          setThinking(false);
-          closeSocket();
+          clearWatchdog();
+          if (autoPlayBestMove) {
+            startHttpFallback();
+          } else {
+            completed = true;
+            setError(data.message || "Search failed.");
+            setThinking(false);
+            closeSocket();
+          }
         }
       };
 
       socket.onerror = () => {
         if (token !== searchTokenRef.current) return;
+        if (!fallbackStarted) {
+          startHttpFallback();
+          return;
+        }
+        clearWatchdog();
         setError("WebSocket error while searching.");
         setThinking(false);
         closeSocket();
@@ -381,16 +457,21 @@ export default function App() {
 
       socket.onclose = () => {
         if (token !== searchTokenRef.current) return;
+        clearWatchdog();
         if (wsRef.current === socket) {
           wsRef.current = null;
         }
         if (!completed) {
-          setThinking(false);
-          setError((prev) => prev || "Search connection closed.");
+          if (!fallbackStarted) {
+            startHttpFallback();
+          } else {
+            setThinking(false);
+            setError((prev) => prev || "Search connection closed.");
+          }
         }
       };
     },
-    [applyMoveToPosition, closeSocket, maxDepth, timeMs]
+    [applyMoveToPosition, buildSearchView, closeSocket, maxDepth, runHttpFallbackSearch, timeMs]
   );
 
   useEffect(() => {

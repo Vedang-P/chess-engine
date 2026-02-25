@@ -30,22 +30,21 @@ const BASE_VALUE_CP = {
   k: 0
 };
 const LEGEND_ITEMS = [
-  { term: "Eval", meaning: "Who is better right now. Positive means White is better." },
-  { term: "Centipawn (cp)", meaning: "Engine unit. 100 cp is roughly equal to one pawn." },
-  { term: "Depth", meaning: "How many half-moves ahead the engine searched." },
-  { term: "Nodes", meaning: "Total positions the engine examined in this search." },
-  { term: "NPS", meaning: "Nodes per second. Higher means faster search speed." },
-  { term: "Cutoffs", meaning: "Branches skipped by alpha-beta pruning to save time." },
-  { term: "PV", meaning: "Principal Variation: the engine's best line right now." },
-  { term: "Candidates", meaning: "Top move choices and their current evaluations." },
-  { term: "Search Flow", meaning: "Live snapshot bars of eval trend while the search runs." },
-  { term: "Dynamic Value", meaning: "Value details for the piece you clicked on the board." },
-  { term: "Square", meaning: "Board coordinate of the currently selected piece." },
-  { term: "Piece", meaning: "The piece type on that selected square (pawn, knight, bishop, etc.)." },
-  { term: "Dynamic (cp)", meaning: "Current live value of that selected piece in this position." },
-  { term: "Base (cp)", meaning: "Starting piece value before position-based adjustments." },
-  { term: "PST (cp)", meaning: "Piece-square table bonus/penalty based on where the piece stands." },
-  { term: "Heatmap", meaning: "Squares currently receiving more tactical pressure." }
+  { term: "Eval", meaning: "Current position score from White's perspective (+ is better for White)." },
+  { term: "Centipawn (cp)", meaning: "Evaluation unit. 100 cp is roughly one pawn." },
+  { term: "PV", meaning: "Principal variation: the best line found in the current search." },
+  { term: "Candidates", meaning: "Top move options ranked by evaluation." },
+  { term: "Depth", meaning: "Search horizon in half-moves (plies)." },
+  { term: "Nodes", meaning: "Total positions examined in the search." },
+  { term: "NPS", meaning: "Nodes per second; higher means faster search throughput." },
+  { term: "Cutoffs", meaning: "Branches pruned by alpha-beta when they cannot improve the result." },
+  { term: "Search Flow", meaning: "Live snapshot bars showing evaluation movement over time." },
+  { term: "Heatmap", meaning: "Board pressure map built from search + evaluation signals." },
+  { term: "Dynamic Value", meaning: "Breakdown panel for the currently tracked piece." },
+  { term: "Piece", meaning: "Type of the tracked piece (pawn, knight, bishop, rook, queen, king)." },
+  { term: "Dynamic (cp)", meaning: "Live signed value of that tracked piece in this position." },
+  { term: "Base (cp)", meaning: "Material base value for the tracked piece." },
+  { term: "PST (cp)", meaning: "Piece-square bonus or penalty from board location." }
 ];
 
 const EMPTY_SEARCH = {

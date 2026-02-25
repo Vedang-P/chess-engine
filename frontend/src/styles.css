@@ -676,6 +676,7 @@ textarea {
 .legend-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 7px;
 }
 
@@ -684,6 +685,10 @@ textarea {
   background: var(--surface-alt);
   border-radius: 2px;
   padding: 7px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 104px;
 }
 
 .legend-item h3 {
@@ -700,6 +705,7 @@ textarea {
   font-size: 0.88rem;
   line-height: 1.36;
   font-family: var(--font-ui);
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 980px) {

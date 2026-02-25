@@ -9,7 +9,6 @@
 It combines:
 - **Correct engine fundamentals** (bitboards, legal move generation, perft-tested correctness)
 - **Search + evaluation transparency** (live PV, candidate moves, eval trends, piece breakdowns)
-- **Production-style architecture** (FastAPI + WebSockets backend, React/SVG frontend)
 
 This project is designed to be understandable for newcomers while still technically rigorous for engineers.
 
@@ -41,20 +40,11 @@ Unlike opaque chess bots, JANUS exposes internal search behavior as the engine t
   - dynamic piece value inspection
   - board heatmaps
 
-## Workflow Visualization
-
-### Search / Telemetry Flow
-![Search Flow](docs/images/search-flow.svg)
-
-### UI Overview
-![UI Overview](docs/images/ui-overview.svg)
-
 ## Tech Stack
 - **Backend:** Python 3.11+, FastAPI, Uvicorn
 - **Frontend:** React (Vite), SVG rendering
 - **Engine:** Custom implementation (no heavy engine libraries)
 - **Transport:** REST + WebSockets
-- **Deployment:** Render (backend) + Cloudflare Pages (frontend)
 
 ## Repository Structure
 ```text
@@ -150,56 +140,3 @@ Example measurements on this implementation:
   - nodes: `197281`
   - elapsed: `2555 ms`
   - nps: `77213`
-
-## Deployment (Beginner-Friendly, Free)
-Recommended stack:
-- **Backend:** Render Free Web Service
-- **Frontend:** Cloudflare Pages
-
-### A) Deploy backend on Render
-This repo already includes:
-- `Dockerfile`
-- `render.yaml`
-
-Steps:
-1. Push this repo to GitHub.
-2. In Render: **New -> Web Service -> Connect repo**.
-3. Render should detect Docker automatically.
-4. Use Free plan.
-5. After deploy, verify:
-   - `https://<your-backend>.onrender.com/health`
-   - should return `{"status":"ok"}`
-
-### B) Deploy frontend on Cloudflare Pages
-1. In Cloudflare: **Workers & Pages -> Create -> Pages -> Connect to Git**.
-2. Select this repo.
-3. Set build config:
-   - Root directory: `frontend`
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-4. Add environment variable:
-   - `VITE_API_BASE=https://<your-backend>.onrender.com`
-5. Deploy.
-
-### C) Final shareable URL
-Use your Cloudflare Pages domain (or custom domain) as the public project URL.
-
-## Troubleshooting
-- Frontend loads but moves/analyze fail:
-  - Check `VITE_API_BASE` points to deployed backend URL.
-- First analysis call is slow on free tier:
-  - Render free service may be waking from idle sleep.
-- WebSocket issues in production:
-  - Confirm backend is HTTPS and frontend uses that HTTPS API base.
-
-## Known Limitations
-- No transposition table / Zobrist hashing yet
-- No quiescence search yet
-- No opening book or tablebases in engine loop
-- Search strength is correctness-first; further performance tuning is possible
-
-## Why This Project Is Resume-Ready
-- Demonstrates algorithmic depth (movegen/search/eval)
-- Shows correctness discipline (perft gate + tests)
-- Includes real-time observability and explainability
-- Ships as a full-stack deployable product

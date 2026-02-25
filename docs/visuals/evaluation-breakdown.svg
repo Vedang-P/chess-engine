@@ -1,59 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="840" viewBox="0 0 1600 840" role="img" aria-label="Evaluation breakdown diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Evaluation breakdown diagram">
   <defs>
     <style>
       .bg { fill: #161616; }
       .panel { fill: #1e1e1e; stroke: #2b2b2b; stroke-width: 2; rx: 16; }
       .title { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 44px; font-weight: 600; }
       .subtitle { fill: #c6a25a; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 20px; font-weight: 500; }
-      .h { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 24px; font-weight: 600; }
-      .t { fill: #d1ccc2; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 18px; }
-      .mono { fill: #c6a25a; font-family: "IBM Plex Mono", monospace; font-size: 20px; }
+      .h { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 24px; font-weight: 600; text-anchor: middle; }
+      .t { fill: #d1ccc2; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 18px; text-anchor: middle; }
+      .mono { fill: #c6a25a; font-family: "IBM Plex Mono", monospace; font-size: 18px; text-anchor: middle; }
       .edge { stroke: #c6a25a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .final-h { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 46px; font-weight: 600; }
+      .final-sub { fill: #c6a25a; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 20px; font-weight: 500; }
+      .final-title { fill: #e6e2d8; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 48px; font-weight: 600; text-anchor: middle; }
+      .final-code { fill: #c6a25a; font-family: "IBM Plex Mono", monospace; font-size: 44px; text-anchor: middle; }
+      .final-text { fill: #d1ccc2; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; font-size: 38px; text-anchor: middle; }
     </style>
     <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
       <path d="M0,0 L0,12 L10,6 z" fill="#c6a25a" />
     </marker>
   </defs>
 
-  <rect class="bg" x="0" y="0" width="1600" height="840" />
+  <rect class="bg" x="0" y="0" width="1600" height="900" />
   <text class="title" x="70" y="82">Evaluation Breakdown</text>
   <text class="subtitle" x="70" y="116">Centipawn score built from interpretable chess terms</text>
 
-  <rect class="panel" x="70" y="170" width="270" height="170" />
-  <text class="h" x="100" y="220">Material</text>
-  <text class="t" x="100" y="255">Base piece values</text>
-  <text class="mono" x="100" y="295">P=100 N=320 B=330</text>
+  <rect class="panel" x="70" y="170" width="260" height="190" />
+  <text class="h" x="200" y="230">Material</text>
+  <text class="t" x="200" y="270">Base piece values</text>
+  <text class="mono" x="200" y="314">P=100 N=320 B=330</text>
 
-  <rect class="panel" x="380" y="170" width="270" height="170" />
-  <text class="h" x="410" y="220">Piece-Square</text>
-  <text class="t" x="410" y="255">PST positional bonuses</text>
-  <text class="mono" x="410" y="295">table[square]</text>
+  <rect class="panel" x="370" y="170" width="260" height="190" />
+  <text class="h" x="500" y="230">Piece-Square</text>
+  <text class="t" x="500" y="270">PST positional bonuses</text>
+  <text class="mono" x="500" y="314">table[square]</text>
 
-  <rect class="panel" x="690" y="170" width="270" height="170" />
-  <text class="h" x="720" y="220">Mobility</text>
-  <text class="t" x="720" y="255">Reachable targets</text>
-  <text class="mono" x="720" y="295">attacks * weight</text>
+  <rect class="panel" x="670" y="170" width="260" height="190" />
+  <text class="h" x="800" y="230">Mobility</text>
+  <text class="t" x="800" y="270">Reachable targets</text>
+  <text class="mono" x="800" y="314">attacks * weight</text>
 
-  <rect class="panel" x="1000" y="170" width="270" height="170" />
-  <text class="h" x="1030" y="220">King Safety</text>
-  <text class="t" x="1030" y="255">Shield + attack ring</text>
-  <text class="mono" x="1030" y="295">pawn cover / pressure</text>
+  <rect class="panel" x="970" y="170" width="260" height="190" />
+  <text class="h" x="1100" y="230">King Safety</text>
+  <text class="t" x="1100" y="270">Shield + attack ring</text>
+  <text class="mono" x="1100" y="314">pawn cover / pressure</text>
 
-  <rect class="panel" x="1310" y="170" width="220" height="170" />
-  <text class="h" x="1340" y="220">Pawn Structure</text>
-  <text class="t" x="1340" y="255">doubled / isolated</text>
-  <text class="mono" x="1340" y="295">passed bonuses</text>
+  <rect class="panel" x="1270" y="170" width="260" height="190" />
+  <text class="h" x="1400" y="230">Pawn Structure</text>
+  <text class="t" x="1400" y="270">doubled / isolated</text>
+  <text class="mono" x="1400" y="314">passed bonuses</text>
 
-  <path class="edge" d="M205 340 C205 455, 575 455, 575 535" />
-  <path class="edge" d="M515 340 C515 455, 645 455, 645 535" />
-  <path class="edge" d="M825 340 C825 455, 715 455, 715 535" />
-  <path class="edge" d="M1135 340 C1135 455, 785 455, 785 535" />
-  <path class="edge" d="M1420 340 C1420 455, 855 455, 855 535" />
+  <path class="edge" d="M200 360 C200 500, 620 500, 620 600" />
+  <path class="edge" d="M500 360 C500 500, 710 500, 710 600" />
+  <path class="edge" d="M800 360 C800 500, 800 500, 800 600" />
+  <path class="edge" d="M1100 360 C1100 500, 890 500, 890 600" />
+  <path class="edge" d="M1400 360 C1400 500, 980 500, 980 600" />
 
-  <rect class="panel" x="420" y="535" width="760" height="235" />
-  <text class="h" x="460" y="595">Final Score Assembly</text>
-  <text class="mono" x="460" y="645">white_total - black_total = white_minus_black</text>
-  <text class="mono" x="460" y="685">score_cp = (side_to_move == white) ? +x : -x</text>
-  <text class="t" x="460" y="725">Detailed maps emitted:</text>
-  <text class="t" x="460" y="752">piece_values, piece_breakdown, heatmap</text>
+  <rect class="panel" x="360" y="600" width="880" height="250" />
+  <text class="h" x="800" y="660">Final Score Assembly</text>
+  <text class="mono" x="800" y="718">white_total - black_total = white_minus_black</text>
+  <text class="mono" x="800" y="762">score_cp = (side_to_move == white) ? +x : -x</text>
+  <text class="t" x="800" y="806">Detailed maps emitted: piece_values, piece_breakdown, heatmap</text>
 </svg>

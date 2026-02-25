@@ -20,6 +20,7 @@
 
 html {
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 body {
@@ -29,12 +30,14 @@ body {
   color: var(--text-main);
   font-family: var(--font-ui);
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .page {
   max-width: 1380px;
   margin: 0 auto;
   padding: 14px;
+  width: 100%;
 }
 
 /* Browsers do not allow forcing zoom; tune desktop layout to match ~90% visual scale. */
@@ -403,6 +406,7 @@ button {
   color: var(--text-main);
   background: var(--surface-2);
   padding: 6px 8px;
+  min-height: 36px;
   cursor: pointer;
   font-size: 0.96rem;
   font-family: var(--font-heading);
@@ -445,6 +449,7 @@ textarea {
   background: #1a1a1a;
   color: var(--text-main);
   padding: 6px 7px;
+  min-height: 36px;
   font-family: var(--font-ui);
   font-size: 0.98rem;
 }
@@ -742,7 +747,21 @@ textarea {
   color: var(--accent-gold);
 }
 
+.credit-github:focus-visible {
+  outline: 1px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
 @media (max-width: 980px) {
+  .page {
+    padding: 10px;
+  }
+
+  .hero {
+    padding: 14px 0 12px;
+    margin-bottom: 8px;
+  }
+
   .layout {
     grid-template-columns: 1fr;
   }
@@ -765,6 +784,12 @@ textarea {
     max-height: none;
   }
 
+  .board-panel,
+  .controls,
+  .legend-panel {
+    padding: 7px;
+  }
+
   .split-columns {
     grid-template-columns: 1fr;
   }
@@ -775,14 +800,98 @@ textarea {
 
   .board-info-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    font-size: 0.7rem;
+  }
+
+  .board-info-row span {
+    min-height: 32px;
+    white-space: normal;
+    line-height: 1.2;
+    padding: 2px 6px;
   }
 
   .legend-grid {
     grid-template-columns: 1fr;
+    grid-auto-rows: auto;
   }
 
   .janus-wordmark {
     letter-spacing: 0.38em;
     text-indent: 0.38em;
+  }
+
+  .dynamic-value-panel {
+    min-height: auto;
+    max-height: none;
+  }
+
+  .candidate-list,
+  .move-table {
+    min-height: 0;
+  }
+
+  .time-control input,
+  .fen-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .credit-line {
+    font-size: 0.84rem;
+    letter-spacing: 0.03em;
+    padding: 10px 0 12px;
+    gap: 10px;
+  }
+
+  .credit-github {
+    width: 28px;
+    height: 28px;
+  }
+
+  .credit-github svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 8px;
+  }
+
+  .janus-wordmark {
+    --janus-title-size: clamp(1.7rem, 10.5vw, 2.35rem);
+    letter-spacing: 0.24em;
+    text-indent: 0.24em;
+  }
+
+  .board-info-row {
+    font-size: 0.66rem;
+  }
+
+  button,
+  select,
+  input[type="number"],
+  input[type="text"],
+  textarea {
+    min-height: 38px;
+  }
+
+  .info-section h2 {
+    font-size: 0.82rem;
+  }
+
+  .pv-line {
+    font-size: 0.96rem;
+  }
+
+  .candidate-row,
+  .move-table-row {
+    font-size: 0.9rem;
+  }
+
+  .legend-item {
+    min-height: 0;
   }
 }

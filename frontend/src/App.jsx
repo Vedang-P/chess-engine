@@ -139,6 +139,17 @@ function fenFullmoveNumber(fen) {
   return parsed;
 }
 
+function createAudioContext() {
+  if (typeof window === "undefined") return null;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  try {
+    return new Ctx();
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [fen, setFen] = useState(START_FEN);
   const [fenDraft, setFenDraft] = useState(START_FEN);
@@ -168,6 +179,8 @@ export default function App() {
   const wsRef = useRef(null);
   const searchTokenRef = useRef(0);
   const lastSnapshotUiUpdateRef = useRef(0);
+  const audioCtxRef = useRef(null);
+  const audioReadyRef = useRef(false);
 
   const board = useMemo(() => parseFenBoard(fen), [fen]);
   const humanTurn = (humanSide === "white" ? "w" : "b") === sideToMove;
@@ -276,6 +289,40 @@ export default function App() {
     }
   }, []);
 
+  const unlockAudio = useCallback(() => {
+    if (audioReadyRef.current) return;
+    const ctx = audioCtxRef.current || createAudioContext();
+    if (!ctx) return;
+    audioCtxRef.current = ctx;
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    audioReadyRef.current = true;
+  }, []);
+
+  const playMoveSound = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx || !audioReadyRef.current || ctx.state !== "running") return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(760, now);
+    osc.frequency.exponentialRampToValueAtTime(520, now + 0.045);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.075, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.065);
+  }, []);
+
   const applyPosition = useCallback((payload) => {
     setFen(payload.fen);
     setFenDraft(payload.fen);
@@ -299,6 +346,7 @@ export default function App() {
   );
 
   const recordMoveLocally = useCallback((move, actor) => {
+    playMoveSound();
     setLastMove({ from: move.slice(0, 2), to: move.slice(2, 4) });
     setMoveLog((prev) => [...prev, { by: actor, move }]);
     setTrackedSquare((prev) => {
@@ -306,7 +354,7 @@ export default function App() {
       if (prev === move.slice(0, 2)) return move.slice(2, 4);
       return prev;
     });
-  }, []);
+  }, [playMoveSound]);
 
   const clearSessionUiState = useCallback(() => {
     setThinking(false);
@@ -580,6 +628,16 @@ export default function App() {
   }, [closeSocket, refreshPosition]);
 
   useEffect(() => {
+    return () => {
+      const ctx = audioCtxRef.current;
+      if (ctx) {
+        ctx.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (status !== "ongoing") {
       setThinking(false);
       closeSocket();
@@ -622,6 +680,7 @@ export default function App() {
 
   const handleSquareDown = useCallback(
     (square, event) => {
+      unlockAudio();
       if (status !== "ongoing" || !humanTurn || thinking) return;
       event?.preventDefault();
       const piece = board[squareToIndex(square)];
@@ -644,7 +703,7 @@ export default function App() {
       setDragFromSquare(null);
       setDragToSquare(null);
     },
-    [status, humanTurn, thinking, board, humanSide, selectedSquare]
+    [unlockAudio, status, humanTurn, thinking, board, humanSide, selectedSquare]
   );
 
   const handleSquareEnter = useCallback(

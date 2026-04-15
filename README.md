@@ -107,7 +107,7 @@ JANUS uses **iterative deepening negamax with alpha-beta pruning**.
 
 ### Pruning Implemented
 - **Alpha-beta cutoff** when `alpha >= beta` (fail-high pruning).
-- **Move ordering heuristic** (simple, but effective):
+- **Move ordering heuristic** :
   - captures first
   - then promotions
   - then castling
@@ -170,7 +170,7 @@ npm run dev
 ```
 
 ## Reproducible Benchmarks and Visuals
-Install visualization dependencies (one-time):
+Install visualization dependencies :
 ```bash
 pip install -r requirements-docs.txt
 ```
